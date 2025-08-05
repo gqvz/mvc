@@ -4,20 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gqvz/mvc/pkg/config"
 	"time"
 )
 
 var DB *sql.DB
 
-type DBConfig struct {
-	Port     int    `env:"DB_PORT"`
-	Host     string `env:"DB_HOST"`
-	Password string `env:"DB_PASSWORD"`
-	User     string `env:"DB_USER"`
-	Database string `env:"DB_DATABASE"`
-}
-
-func InitDatabase(config DBConfig) (*sql.DB, error) {
+func InitDatabase(config config.DBConfig) (*sql.DB, error) {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
 		config.User, config.Password, config.Host, config.Port, config.Database)
@@ -37,6 +30,7 @@ func InitDatabase(config DBConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("error connecting to the database: %v", err)
 	}
 
+	fmt.Println("Database connection established successfully")
 	return DB, nil
 
 }

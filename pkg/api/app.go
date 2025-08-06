@@ -39,4 +39,7 @@ func RegisterRoutes(router *mux.Router) {
 
 	authController := controllers.CreateTokenController()
 	authController.RegisterRoutes(router)
+
+	tagController := controllers.CreateTagController()
+	tagController.RegisterRoutes(router)
 }

@@ -1,0 +1,232 @@
+package controllers
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/gqvz/mvc/pkg/middlewares"
+	"github.com/gqvz/mvc/pkg/models"
+	"net/http"
+	"strconv"
+	"strings"
+)
+
+type TagController struct{}
+
+func CreateTagController() *TagController {
+	return &TagController{}
+}
+
+func (c *TagController) RegisterRoutes(router *mux.Router) {
+	createTagHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.CreateTagHandler))
+	router.Handle("/tags", createTagHandler).Methods("POST")
+
+	getTagsHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetTagsHandler))
+	router.Handle("/tags", getTagsHandler).Methods("GET")
+
+	getTagHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetTagHandler))
+	router.Handle("/tags/{id:[0-9]+}", getTagHandler).Methods("GET")
+
+	editTagHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.EditTagHandler))
+	router.Handle("/tags/{id:[0-9]+}", editTagHandler).Methods("PUT")
+}
+
+type CreateTagRequest struct {
+	Name string `json:"name" example:"real"`
+}
+
+type CreateTagResponse struct {
+	Id int64 `json:"id"`
+}
+
+// @Summary Create tag
+// @Description Create a new tag
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param tag body CreateTagRequest true "Tag request"
+// @Security jwt
+// @Security cookie
+// @Success 201 {object} CreateTagResponse "Created tag"
+// @Failure 400 {object} ErrorResponse "Bad request, invalid tag name"
+// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
+// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to create tags"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /tags [post]
+func (c *TagController) CreateTagHandler(w http.ResponseWriter, r *http.Request) {
+	var req CreateTagRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Name == "" {
+		http.Error(w, "Tag name is required", http.StatusBadRequest)
+		return
+	}
+
+	tag, err := models.CreateTag(req.Name)
+	if err != nil {
+		http.Error(w, "Failed to create tag", http.StatusInternalServerError)
+		return
+	}
+
+	response := CreateTagResponse{
+		Id: tag.Id,
+	}
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		fmt.Println("Error encoding response:", err)
+	}
+}
+
+type GetTagResponse struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+// @Summary Get tag by ID
+// @Description Get a tag by its ID
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param id path int true "Tag ID"
+// @Security jwt
+// @Security cookie
+// @Success 200 {object} GetTagResponse "Tag details"
+// @Failure 400 {object} ErrorResponse "Bad request, invalid tag ID"
+// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
+// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to view
+// @Failure 404 {object} ErrorResponse "Tag not found"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /tags/{id} [get]
+func (c *TagController) GetTagHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid tag ID", http.StatusBadRequest)
+		return
+	}
+
+	tag, err := models.GetTagById(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			http.Error(w, "Tag not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Failed to retrieve tag", http.StatusInternalServerError)
+		return
+	}
+
+	response := GetTagResponse{
+		Id:   tag.Id,
+		Name: tag.Name,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		fmt.Println("Error encoding response:", err)
+		return
+	}
+}
+
+// @Summary Get tags
+// @Description Get all tags
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Security jwt
+// @Security cookie
+// @Success 200 {array} GetTagResponse "List of tags"
+// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
+// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to view tags"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /tags [get]
+func (c *TagController) GetTagsHandler(w http.ResponseWriter, r *http.Request) {
+	tags, err := models.GetTags()
+	if err != nil {
+		http.Error(w, "Failed to retrieve tags", http.StatusInternalServerError)
+		return
+	}
+
+	var tagResponses []GetTagResponse
+	for _, tag := range tags {
+		tagResponses = append(tagResponses, GetTagResponse{
+			Id:   tag.Id,
+			Name: tag.Name,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(tagResponses)
+	if err != nil {
+		fmt.Println("Error encoding response:", err)
+		return
+	}
+}
+
+type EditTagRequest = CreateTagRequest
+type EditTagResponse = GetTagResponse
+
+// @Summary Edit tag
+// @Description Edit an existing tag
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param id path int true "Tag ID"
+// @Param tag body EditTagRequest true "Tag request"
+// @Security jwt
+// @Security cookie
+// @Success 200 {object} EditTagResponse "Updated tag"
+// @Failure 400 {object} ErrorResponse "Bad request, invalid tag name or ID
+// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
+// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to edit
+// @Failure 404 {object} ErrorResponse "Tag not found"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /tags/{id} [put]
+func (c *TagController) EditTagHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid tag ID", http.StatusBadRequest)
+		return
+	}
+
+	var req EditTagRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Name == "" {
+		http.Error(w, "Tag name is required", http.StatusBadRequest)
+		return
+	}
+
+	tag, err := models.EditTag(id, req.Name)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			http.Error(w, "Tag not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Failed to edit tag", http.StatusInternalServerError)
+		return
+	}
+
+	response := EditTagResponse{
+		Id:   tag.Id,
+		Name: tag.Name,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		fmt.Println("Error encoding response:", err)
+		return
+	}
+}

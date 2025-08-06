@@ -41,9 +41,9 @@ type CreateTokenResponse struct {
 // @Produce json
 // @Param credentials body CreateTokenRequest true "User credentials"
 // @Success 201 {object} CreateTokenResponse
-// @Failure 400 {object} ErrorResponse "Bad request, missing or invalid parameters"
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid username or password"
-// @Failure 500 {object} ErrorResponse "Internal server error, failed to create token"
+// @Failure 400 {object} string "Bad request, missing or invalid parameters"
+// @Failure 401 {object} string "Unauthorized, invalid username or password"
+// @Failure 500 {object} string "Internal server error, failed to create token"
 // @Router /token [post]
 func (ac *TokenController) CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var req CreateTokenRequest

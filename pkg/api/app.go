@@ -42,4 +42,7 @@ func RegisterRoutes(router *mux.Router) {
 
 	tagController := controllers.CreateTagController()
 	tagController.RegisterRoutes(router)
+
+	itemController := controllers.CreateItemController()
+	itemController.RegisterRoutes(router)
 }

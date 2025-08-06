@@ -38,7 +38,7 @@ type CreateUserRequest struct {
 }
 
 type CreateUserResponse struct {
-	Message string `json:"message" example:"User created successfully"`
+	ID int64 `json:"id" example:"1"`
 }
 
 // @Summary Create a new user
@@ -48,9 +48,9 @@ type CreateUserResponse struct {
 // @Produce json
 // @Param user body CreateUserRequest true "User information"
 // @Success 201 {object} CreateUserResponse
-// @Failure 400 {object} ErrorResponse "Bad request, missing or invalid parameters"
-// @Failure 409 {object} ErrorResponse "Conflict, user with the same email or username already exists"
-// @Failure 500 {object} ErrorResponse "Internal server error, failed to create user"
+// @Failure 400 {object} string "Bad request, missing or invalid parameters"
+// @Failure 409 {object} string "Conflict, user with the same email or username already exists"
+// @Failure 500 {object} string "Internal server error, failed to create user"
 // @Router /users/ [post]
 func (uc *UserController) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	var req CreateUserRequest
@@ -89,7 +89,7 @@ func (uc *UserController) CreateUserHandler(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(CreateUserResponse{Message: "User created successfully"})
+	err = json.NewEncoder(w).Encode(CreateUserResponse{ID: user.ID})
 	if err != nil {
 		log.Printf("Error encoding response: %v", err)
 		return
@@ -116,12 +116,12 @@ type EditUserResponse struct {
 // @Security jwt
 // @Security cookie
 // @Success 200 {object} EditUserResponse
-// @Failure 400 {object} ErrorResponse "Bad request, missing or invalid parameters"
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
-// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to edit this user"
-// @Failure 404 {object} ErrorResponse "Not Found, user with the specified ID does not exist"
-// @Failure 409 {object} ErrorResponse "Conflict, user with the same email or username already exists"
-// @Failure 500 {object} ErrorResponse "Internal server error, failed to edit user"
+// @Failure 400 {object} string "Bad request, missing or invalid parameters"
+// @Failure 401 {object} string "Unauthorized, invalid token"
+// @Failure 403 {object} string "Forbidden, you are not allowed to edit this user"
+// @Failure 404 {object} string "Not Found, user with the specified ID does not exist"
+// @Failure 409 {object} string "Conflict, user with the same email or username already exists"
+// @Failure 500 {object} string "Internal server error, failed to edit user"
 // @Router /users/{id} [patch]
 func (uc *UserController) EditUserHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -212,11 +212,11 @@ type GetUserResponse struct {
 // @Security jwt
 // @Security cookie
 // @Success 200 {object} GetUserResponse
-// @Failure 400 {object} ErrorResponse "Bad request, invalid user ID"
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
-// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to view this user"
-// @Failure 404 {object} ErrorResponse "Not Found, user with the specified ID does not exist"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 400 {object} string "Bad request, invalid user ID"
+// @Failure 401 {object} string "Unauthorized, invalid token"
+// @Failure 403 {object} string "Forbidden, you are not allowed to view this user"
+// @Failure 404 {object} string "Not Found, user with the specified ID does not exist"
+// @Failure 500 {object} string "Internal server error"
 // @Router /users/{id} [get]
 func (uc *UserController) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -269,10 +269,10 @@ func (uc *UserController) GetUserHandler(w http.ResponseWriter, r *http.Request)
 // @Security jwt
 // @Security cookie
 // @Success 200 {object} []GetUserResponse "List of users"
-// @Failure 400 {object} ErrorResponse "Bad request, invalid user ID"
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
-// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to view fetch users"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 400 {object} string "Bad request, invalid user ID"
+// @Failure 401 {object} string "Unauthorized, invalid token"
+// @Failure 403 {object} string "Forbidden, you are not allowed to view fetch users"
+// @Failure 500 {object} string "Internal server error"
 // @Router /users [get]
 func (uc *UserController) GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 	search := r.URL.Query().Get("search")
@@ -325,9 +325,4 @@ func (uc *UserController) GetUsersHandler(w http.ResponseWriter, r *http.Request
 		log.Printf("Error encoding response: %v", err)
 		return
 	}
-}
-
-type ErrorResponse struct {
-	Error   string `json:"error" example:"Error message"`
-	Message string `json:"message" example:"Error message"`
 }

@@ -48,10 +48,10 @@ type CreateTagResponse struct {
 // @Security jwt
 // @Security cookie
 // @Success 201 {object} CreateTagResponse "Created tag"
-// @Failure 400 {object} ErrorResponse "Bad request, invalid tag name"
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
-// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to create tags"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 400 {object} string "Bad request, invalid tag name"
+// @Failure 401 {object} string "Unauthorized, invalid token"
+// @Failure 403 {object} string "Forbidden, you are not allowed to create tags"
+// @Failure 500 {object} string "Internal server error"
 // @Router /tags [post]
 func (c *TagController) CreateTagHandler(w http.ResponseWriter, r *http.Request) {
 	var req CreateTagRequest
@@ -96,11 +96,11 @@ type GetTagResponse struct {
 // @Security jwt
 // @Security cookie
 // @Success 200 {object} GetTagResponse "Tag details"
-// @Failure 400 {object} ErrorResponse "Bad request, invalid tag ID"
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
-// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to view
-// @Failure 404 {object} ErrorResponse "Tag not found"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 400 {object} string "Bad request, invalid tag ID"
+// @Failure 401 {object} string "Unauthorized, invalid token"
+// @Failure 403 {object} string "Forbidden, you are not allowed to view
+// @Failure 404 {object} string "Tag not found"
+// @Failure 500 {object} string "Internal server error"
 // @Router /tags/{id} [get]
 func (c *TagController) GetTagHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -142,9 +142,9 @@ func (c *TagController) GetTagHandler(w http.ResponseWriter, r *http.Request) {
 // @Security jwt
 // @Security cookie
 // @Success 200 {array} GetTagResponse "List of tags"
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
-// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to view tags"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 401 {object} string "Unauthorized, invalid token"
+// @Failure 403 {object} string "Forbidden, you are not allowed to view tags"
+// @Failure 500 {object} string "Internal server error"
 // @Router /tags [get]
 func (c *TagController) GetTagsHandler(w http.ResponseWriter, r *http.Request) {
 	tags, err := models.GetTags()
@@ -182,11 +182,11 @@ type EditTagResponse = GetTagResponse
 // @Security jwt
 // @Security cookie
 // @Success 200 {object} EditTagResponse "Updated tag"
-// @Failure 400 {object} ErrorResponse "Bad request, invalid tag name or ID
-// @Failure 401 {object} ErrorResponse "Unauthorized, invalid token"
-// @Failure 403 {object} ErrorResponse "Forbidden, you are not allowed to edit
-// @Failure 404 {object} ErrorResponse "Tag not found"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 400 {object} string "Bad request, invalid tag name or ID
+// @Failure 401 {object} string "Unauthorized, invalid token"
+// @Failure 403 {object} string "Forbidden, you are not allowed to edit
+// @Failure 404 {object} string "Tag not found"
+// @Failure 500 {object} string "Internal server error"
 // @Router /tags/{id} [put]
 func (c *TagController) EditTagHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

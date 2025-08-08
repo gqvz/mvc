@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"go-simpler.org/env"
+	"strings"
 )
 
 var Config AppConfig
@@ -25,7 +26,9 @@ type DBConfig struct {
 func LoadConfig() (*AppConfig, error) {
 	err := godotenv.Load()
 	if err != nil {
-		return nil, fmt.Errorf("error loading env variables: %v", err)
+		if !strings.Contains(err.Error(), "no such file or directory") {
+			return nil, fmt.Errorf("error loading env variables: %v", err)
+		}
 	}
 
 	err = env.Load(&Config, nil)

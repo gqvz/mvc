@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
 	"net/http"
 	"strconv"
@@ -15,20 +14,6 @@ type PaymentController struct {
 
 func CreatePaymentController() *PaymentController {
 	return &PaymentController{}
-}
-
-func (c *PaymentController) RegisterRoutes(router *mux.Router) {
-	createPaymentHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.CreatePaymentHandler))
-	router.Handle("/payments", createPaymentHandler).Methods("POST")
-
-	getPaymentHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetPaymentHandler))
-	router.Handle("/payments/{id:[0-9]+}", getPaymentHandler).Methods("GET")
-
-	getPaymentsHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetPaymentsHandler))
-	router.Handle("/payments", getPaymentsHandler).Methods("GET")
-
-	editPaymentStatusHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.EditPaymentStatusHandler))
-	router.Handle("/payments/{id:[0-9]+}", editPaymentStatusHandler).Methods("PATCH")
 }
 
 type CreatePaymentRequest struct {

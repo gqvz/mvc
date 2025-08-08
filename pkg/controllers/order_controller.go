@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
 	"net/http"
 	"strconv"
@@ -16,20 +15,6 @@ type OrderController struct {
 
 func CreateOrderController() *OrderController {
 	return &OrderController{}
-}
-
-func (c *OrderController) RegisterRoutes(router *mux.Router) {
-	createOrderHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.CreateOrder))
-	router.Handle("/orders", createOrderHandler).Methods("POST")
-
-	closeOrderHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.CloseOrder))
-	router.Handle("/orders/{id:[0-9]+}/close", closeOrderHandler).Methods("POST")
-
-	getOrderHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetOrder))
-	router.Handle("/orders/{id:[0-9]+}", getOrderHandler).Methods("GET")
-
-	getOrdersHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetOrders))
-	router.Handle("/orders", getOrdersHandler).Methods("GET")
 }
 
 type CreateOrderRequest struct {

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/gorilla/mux"
 	"github.com/gqvz/mvc/pkg/config"
 	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
@@ -19,10 +18,6 @@ type TokenController struct{}
 
 func CreateTokenController() *TokenController {
 	return &TokenController{}
-}
-
-func (ac *TokenController) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/token", ac.CreateTokenHandler).Methods("POST")
 }
 
 type CreateTokenRequest struct {

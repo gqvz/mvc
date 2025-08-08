@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
 	"net/http"
 	"strconv"
@@ -15,20 +14,6 @@ type OrderItemController struct {
 
 func CreateOrderItemController() *OrderItemController {
 	return &OrderItemController{}
-}
-
-func (c *OrderItemController) RegisterRoutes(router *mux.Router) {
-	createOrderItemHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.CreateOrderItem))
-	router.Handle("/orders/{id:[0-9]+}/items", createOrderItemHandler).Methods("POST")
-
-	editOrderItemStatusHandler := middlewares.Authorize(models.Chef)(http.HandlerFunc(c.EditOrderItemStatus))
-	router.Handle("/orders/items/{id:[0-9]+}/", editOrderItemStatusHandler).Methods("PATCH")
-
-	getOrderItemsHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetOrderItems))
-	router.Handle("/orders/{id:[0-9]+}/items", getOrderItemsHandler).Methods("GET")
-
-	getOrderItemsByStatusHandler := middlewares.Authorize(models.Chef)(http.HandlerFunc(c.GetOrderItemsByStatus))
-	router.Handle("/orders/items", getOrderItemsByStatusHandler).Methods("GET")
 }
 
 type CreateOrderItemRequest struct {

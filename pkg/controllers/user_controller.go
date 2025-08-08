@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,19 +15,6 @@ type UserController struct{}
 
 func CreateUserController() *UserController {
 	return &UserController{}
-}
-
-func (uc *UserController) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/users/", uc.CreateUserHandler).Methods("POST")
-
-	editUserHandler := middlewares.Authorize(models.Any)(http.HandlerFunc(uc.EditUserHandler))
-	router.Handle("/users/{id}", editUserHandler).Methods("PATCH")
-
-	getUserHandler := middlewares.Authorize(models.Any)(http.HandlerFunc(uc.GetUserHandler))
-	router.Handle("/users/{id}", getUserHandler).Methods("GET")
-
-	getUsersHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(uc.GetUsersHandler))
-	router.Handle("/users", getUsersHandler).Methods("GET")
 }
 
 type CreateUserRequest struct {

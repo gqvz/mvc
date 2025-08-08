@@ -47,7 +47,12 @@ func main() {
 		return
 	}
 
-	server := api.CreateHTTPServer(appConfig)
+	router := api.CreateRouter(appConfig)
+
+	server := &http.Server{
+		Addr:    appConfig.ServerAddress,
+		Handler: router,
+	}
 
 	go func() {
 		fmt.Println("Starting server on", appConfig.ServerAddress)

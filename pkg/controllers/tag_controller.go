@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
 	"net/http"
 	"strconv"
@@ -15,20 +14,6 @@ type TagController struct{}
 
 func CreateTagController() *TagController {
 	return &TagController{}
-}
-
-func (c *TagController) RegisterRoutes(router *mux.Router) {
-	createTagHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.CreateTagHandler))
-	router.Handle("/tags", createTagHandler).Methods("POST")
-
-	getTagsHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetTagsHandler))
-	router.Handle("/tags", getTagsHandler).Methods("GET")
-
-	getTagHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetTagHandler))
-	router.Handle("/tags/{id:[0-9]+}", getTagHandler).Methods("GET")
-
-	editTagHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.EditTagHandler))
-	router.Handle("/tags/{id:[0-9]+}", editTagHandler).Methods("PUT")
 }
 
 type CreateTagRequest struct {

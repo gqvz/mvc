@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
 	"log"
 	"net/http"
@@ -16,20 +15,6 @@ type ItemController struct {
 
 func CreateItemController() *ItemController {
 	return &ItemController{}
-}
-
-func (c *ItemController) RegisterRoutes(router *mux.Router) {
-	createItemHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.CreateItemHandler))
-	router.Handle("/items", createItemHandler).Methods("POST")
-
-	getItemHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetItemHandler))
-	router.Handle("/items/{id:[0-9]+}", getItemHandler).Methods("GET")
-
-	getItemsHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetItemsHandler))
-	router.Handle("/items", getItemsHandler).Methods("GET")
-
-	editTagHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.EditItemHandler))
-	router.Handle("/items/{id:[0-9]+}", editTagHandler).Methods("PUT")
 }
 
 type CreateItemRequest struct {

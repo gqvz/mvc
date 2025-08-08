@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/gqvz/mvc/pkg/middlewares"
 	"github.com/gqvz/mvc/pkg/models"
 	"net/http"
 	"strconv"
@@ -15,20 +14,6 @@ type RequestController struct {
 
 func CreateRequestController() *RequestController {
 	return &RequestController{}
-}
-
-func (c *RequestController) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/requests", c.CreateRequestHandler).Methods("POST")
-
-	router.HandleFunc("/requests", c.GetRequestsHandler).Methods("GET")
-
-	grantRequestHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.GrantRequestHandler))
-	router.Handle("/requests/{id:[0-9]+}/grant", grantRequestHandler).Methods("POST")
-
-	rejectRequestHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.RejectRequestHandler))
-	router.Handle("/requests/{id:[0-9]+}/reject", rejectRequestHandler).Methods("POST")
-
-	router.HandleFunc("/requests/{id:[0-9]+}/seen", c.MarkRequestSeenHandler).Methods("POST")
 }
 
 type CreateRequestRequest struct {

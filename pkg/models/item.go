@@ -16,7 +16,6 @@ type Item struct {
 	Available   bool    `json:"available"`
 }
 
-// NOTE this function assumes that the tags given are valid
 func CreateItem(ctx context.Context, name string, description string, price float64, tags []Tag, imageURL string, available bool) (*Item, error) {
 	tx, err := DB.BeginTx(ctx, nil)
 	if err != nil {

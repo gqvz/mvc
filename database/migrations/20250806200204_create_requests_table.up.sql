@@ -7,3 +7,9 @@ CREATE TABLE `Requests`
     `user_status` ENUM ('seen', 'unseen')                 NOT NULL,
     `granted_by`  INTEGER
 );
+
+ALTER TABLE `Requests`
+    ADD FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`);
+
+ALTER TABLE `Requests`
+    ADD FOREIGN KEY (`granted_by`) REFERENCES `Users` (`id`);

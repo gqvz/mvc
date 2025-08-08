@@ -2,8 +2,12 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gqvz/mvc/pkg/config"
 	"time"
 )
@@ -30,6 +34,15 @@ func InitDatabase(config config.DBConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("error connecting to the database: %v", err)
 	}
 
+	driver, _ := mysql.WithInstance(DB, &mysql.Config{})
+	m, err := migrate.NewWithDatabaseInstance("file://database/migrations", "mysql", driver)
+	if err != nil {
+		return nil, fmt.Errorf("error creating migration instance: %v", err)
+	}
+	err = m.Up()
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return nil, fmt.Errorf("error applying migrations: %v", err)
+	}
 	fmt.Println("Database connection established successfully")
 	return DB, nil
 

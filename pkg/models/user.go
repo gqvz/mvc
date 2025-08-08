@@ -74,8 +74,8 @@ func GetUserById(id int64) (*User, error) {
 	return &user, nil
 }
 
-func EditUser(id int64, name string, email string, password string) error {
-	_, err := DB.Exec("UPDATE Users SET name = ?, email = ?, password_hash = ? WHERE id = ?", name, email, password, id)
+func EditUser(id int64, name string, email string, password string, role Role) error {
+	_, err := DB.Exec("UPDATE Users SET name = ?, email = ?, password_hash = ?, role = ? WHERE id = ?", name, email, password, id, role)
 	return err
 }
 
@@ -128,4 +128,9 @@ func GetUsers(search string, role Role, limit int, offset int) ([]User, error) {
 		users = append(users, user)
 	}
 	return users, nil
+}
+
+func AddUserRole(id int64, role Role) error {
+	_, err := DB.Exec("UPDATE Users SET role = role | ? WHERE id = ?", role, id)
+	return err
 }

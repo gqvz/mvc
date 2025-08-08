@@ -214,7 +214,18 @@ func (c *RequestController) GrantRequestHandler(w http.ResponseWriter, r *http.R
 		http.Error(w, "Failed to grant request", http.StatusInternalServerError)
 		return
 	}
-	// TODO give the role to the user
+
+	request, err := models.GetRequestById(id)
+	if err != nil {
+
+		http.Error(w, "Failed to retrieve request", http.StatusInternalServerError)
+		return
+	}
+
+	if err := models.AddUserRole(request.UserID, request.Role); err != nil {
+		http.Error(w, "Failed to update user role", http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

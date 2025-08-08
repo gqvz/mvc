@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type UserSeenStatus string
 
@@ -114,4 +117,16 @@ func GetRequests(userID int64, role Role, status RequestStatus, seenStatus UserS
 	}
 
 	return requests, nil
+}
+
+func GetRequestById(id int64) (*Request, error) {
+	row := DB.QueryRow("SELECT id, user_id, role, status, user_status FROM Requests WHERE id = ?", id)
+	var request Request
+	if err := row.Scan(&request.ID, &request.UserID, &request.Role, &request.Status, &request.UserStatus); err != nil {
+		if strings.Contains(err.Error(), "no rows") {
+			return nil, fmt.Errorf("request not found")
+		}
+		return nil, err
+	}
+	return &request, nil
 }

@@ -54,4 +54,7 @@ func RegisterRoutes(router *mux.Router) {
 
 	orderItemController := controllers.CreateOrderItemController()
 	orderItemController.RegisterRoutes(router)
+
+	paymentController := controllers.CreatePaymentController()
+	paymentController.RegisterRoutes(router)
 }

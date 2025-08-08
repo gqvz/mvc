@@ -97,9 +97,10 @@ func (uc *UserController) CreateUserHandler(w http.ResponseWriter, r *http.Reque
 }
 
 type EditUserRequest struct {
-	Name     string `json:"name" example:"real"`
-	Email    string `json:"email" example:"real@real.com"`
-	Password string `json:"password" example:"realpassword"`
+	Name     string      `json:"name" example:"real"`
+	Email    string      `json:"email" example:"real@real.com"`
+	Password string      `json:"password" example:"realpassword"`
+	Role     models.Role `json:"role" example:"1"`
 }
 
 type EditUserResponse struct {
@@ -182,7 +183,7 @@ func (uc *UserController) EditUserHandler(w http.ResponseWriter, r *http.Request
 		hashedPassword = user.PasswordHash
 	}
 
-	err = models.EditUser(id, req.Name, req.Email, hashedPassword)
+	err = models.EditUser(id, req.Name, req.Email, hashedPassword, req.Role)
 	if err != nil {
 		http.Error(w, "Error editing user", http.StatusInternalServerError)
 		return

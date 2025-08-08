@@ -231,3 +231,39 @@ func GetItems(tags []Tag, search string, available bool, limit int, offset int) 
 
 	return items, nil
 }
+
+func GetItemByIdBulk(ids []int64) (*[]Item, error) {
+
+	query := "SELECT Items.id, Items.name, description, price, is_available, image_url, CONCAT('[', GROUP_CONCAT(JSON_OBJECT('id', Tags.id, 'name', Tags.name)), ']') as tags FROM Items JOIN ItemTags ON ItemTags.item_id = Items.id JOIN Tags ON ItemTags.tag_id = Tags.id WHERE Items.id IN ("
+
+	args := make([]any, len(ids))
+	for i, id := range ids {
+		query += "?,"
+		args[i] = id
+	}
+	query = query[:len(query)-1] + ") GROUP BY Items.id;"
+
+	rows, err := DB.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []Item
+	for rows.Next() {
+		var item Item
+		var tagsJSON string
+		if err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Available, &item.ImageURL, &tagsJSON); err != nil {
+			return nil, err
+		}
+
+		if tagsJSON != "[]" {
+			if err := json.Unmarshal([]byte(tagsJSON), &item.Tags); err != nil {
+				return nil, fmt.Errorf("failed to read tags: %v", err)
+			}
+		}
+		items = append(items, item)
+	}
+
+	return &items, nil
+}

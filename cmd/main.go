@@ -23,6 +23,7 @@ import (
 // @description     MVC Assignment
 
 // @host      localhost:3000
+// @host      206.189.128.208:3000
 // @BasePath  /api
 
 // @securityDefinitions.apikey jwt

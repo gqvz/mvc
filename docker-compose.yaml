@@ -1,0 +1,38 @@
+services:
+  mvc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mvc_container
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_USER: root
+      DB_DATABASE: mvc
+      DB_PASSWORD: root
+      DB_HOST: db
+      DB_PORT: 3306
+      JWT_SECRET: asd
+      SERVER_ADDRESS: :3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:latest
+    container_name: mvcdb_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  mysql_data:
+    driver: local

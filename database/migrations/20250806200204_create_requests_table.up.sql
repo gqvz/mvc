@@ -5,11 +5,7 @@ CREATE TABLE `Requests`
     `role`        TINYINT                                 NOT NULL,
     `status`      ENUM ('pending', 'granted', 'rejected') NOT NULL,
     `user_status` ENUM ('seen', 'unseen')                 NOT NULL,
-    `granted_by`  INTEGER
+    `granted_by`  INTEGER,
+    FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`),
+    FOREIGN KEY (`granted_by`) REFERENCES `Users` (`id`)
 );
-
-ALTER TABLE `Requests`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`);
-
-ALTER TABLE `Requests`
-    ADD FOREIGN KEY (`granted_by`) REFERENCES `Users` (`id`);

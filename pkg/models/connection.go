@@ -16,8 +16,8 @@ var DB *sql.DB
 
 func InitDatabase(config config.DBConfig) (*sql.DB, error) {
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
-		config.User, config.Password, config.Host, config.Port, config.Database)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/?parseTime=true",
+		config.User, config.Password, config.Host, config.Port)
 
 	var err error
 	DB, err = sql.Open("mysql", dsn)
@@ -25,14 +25,37 @@ func InitDatabase(config config.DBConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("error opening the database: %v", err)
 	}
 
-	DB.SetConnMaxLifetime(5 * time.Minute)
-	DB.SetMaxOpenConns(25)
-	DB.SetMaxIdleConns(5)
+	err = DB.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to the database: %v", err)
+	}
+
+	_, err = DB.Exec("CREATE DATABASE IF NOT EXISTS " + config.Database)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database: %v", err)
+	}
+
+	err = DB.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
+		config.User, config.Password, config.Host, config.Port, config.Database)
+
+	DB, err = sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("error opening the database: %v", err)
+	}
 
 	err = DB.Ping()
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to the database: %v", err)
 	}
+
+	DB.SetConnMaxLifetime(5 * time.Minute)
+	DB.SetMaxOpenConns(25)
+	DB.SetMaxIdleConns(5)
 
 	driver, _ := mysql.WithInstance(DB, &mysql.Config{})
 	m, err := migrate.NewWithDatabaseInstance("file://database/migrations", "mysql", driver)
@@ -43,6 +66,17 @@ func InitDatabase(config config.DBConfig) (*sql.DB, error) {
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return nil, fmt.Errorf("error applying migrations: %v", err)
 	}
+
+	var count int
+	err = DB.QueryRow("SELECT COUNT(*) FROM Users WHERE email = ?", "admin@admin.com").Scan(&count)
+	if err != nil {
+		return nil, fmt.Errorf("error checking for default user: %v", err)
+	}
+
+	if count == 0 {
+		_, err = DB.Exec("INSERT INTO Users (name, email, role, password_hash) VALUES (?, ?, ?, ?)", "admin", "admin@admin.com", Admin, "$2a$10$k8k1yOPNNnrA09HrknR1eO01b6NV")
+	}
+
 	fmt.Println("Database connection established successfully")
 	return DB, nil
 

@@ -1,16 +1,21 @@
-FROM golang:latest
-LABEL authors="gqvz"
+FROM golang:latest AS builder
+LABEL author="gqvz"
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y make
-
-RUN go install github.com/swaggo/swag/cmd/swag@latest
-
 COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
 
-RUN make swagger
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN $(go env GOPATH)/bin/swag init -g cmd/main.go
 
-CMD ["make", "run"]
+RUN CGO_ENABLED=0 GOOS=linux go build -a -o /main ./cmd/main.go
+
+FROM scratch
+
+WORKDIR /app
+
+COPY --from=builder /main .
+COPY --from=builder /app/docs ./docs
+
+CMD ["/main"]

@@ -15,6 +15,9 @@ services:
       DB_PORT: 3306
       JWT_SECRET: asd
       SERVER_ADDRESS: :3000
+      DEFAULT_USER_NAME: admin
+      DEFAULT_USER_PASSWORD: admin
+      DEFAULT_USER_EMAIL: admin@admin.com
     depends_on:
       db:
         condition: service_healthy

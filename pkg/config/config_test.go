@@ -13,6 +13,9 @@ func TestLoadConfig_Success(t *testing.T) {
 	os.Setenv("DB_PASSWORD", "pass")
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_PORT", "3306")
+	os.Setenv("DEFAULT_USER_NAME", "admin")
+	os.Setenv("DEFAULT_USER_PASSWORD", "admin")
+	os.Setenv("DEFAULT_USER_EMAIL", "admin@admin.com")
 	defer os.Unsetenv("SERVER_ADDRESS")
 	defer os.Unsetenv("JWT_SECRET")
 	defer os.Unsetenv("DB_DATABASE")
@@ -20,6 +23,9 @@ func TestLoadConfig_Success(t *testing.T) {
 	defer os.Unsetenv("DB_PASSWORD")
 	defer os.Unsetenv("DB_HOST")
 	defer os.Unsetenv("DB_PORT")
+	defer os.Unsetenv("DEFAULT_USER_NAME")
+	defer os.Unsetenv("DEFAULT_USER_PASSWORD")
+	defer os.Unsetenv("DEFAULT_USER_EMAIL")
 
 	cfg, err := LoadConfig()
 	if err != nil {
@@ -45,5 +51,14 @@ func TestLoadConfig_Success(t *testing.T) {
 	}
 	if cfg.DB.Port != 3306 {
 		t.Errorf("Expected DB.Port to be 3306, got %d", cfg.DB.Port)
+	}
+	if cfg.DB.DefaultUser.Name != "admin" {
+		t.Errorf("Expected DefaultUser.Name to be 'admin', got '%s'", cfg.DB.DefaultUser.Name)
+	}
+	if cfg.DB.DefaultUser.Password != "admin" {
+		t.Errorf("Expected DefaultUser.Password to be 'admin', got '%s'", cfg.DB.DefaultUser.Password)
+	}
+	if cfg.DB.DefaultUser.Email != "admin@admin.com" {
+		t.Errorf("Expected DefaultUser.Email to be 'admin@admin.com', got '%s'", cfg.DB.DefaultUser.Email)
 	}
 }

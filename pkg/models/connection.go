@@ -9,6 +9,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gqvz/mvc/pkg/config"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -74,7 +75,14 @@ func InitDatabase(config config.DBConfig) (*sql.DB, error) {
 	}
 
 	if count == 0 {
-		_, err = DB.Exec("INSERT INTO Users (name, email, role, password_hash) VALUES (?, ?, ?, ?)", "admin", "admin@admin.com", Admin, "$2a$10$k8k1yOPNNnrA09HrknR1eO01b6NV")
+		passwordHash, err := bcrypt.GenerateFromPassword([]byte(config.DefaultUser.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, fmt.Errorf("error hashing default user password: %v", err)
+		}
+		_, err = DB.Exec("INSERT INTO Users (name, email, role, password_hash) VALUES (?, ?, ?, ?)", config.DefaultUser.Name, config.DefaultUser.Email, Admin, passwordHash)
+		if err != nil {
+			return nil, fmt.Errorf("error inserting default user: %v", err)
+		}
 	}
 
 	fmt.Println("Database connection established successfully")

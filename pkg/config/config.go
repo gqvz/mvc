@@ -16,11 +16,18 @@ type AppConfig struct {
 }
 
 type DBConfig struct {
-	Port     int    `env:"DB_PORT"`
-	Host     string `env:"DB_HOST"`
-	Password string `env:"DB_PASSWORD"`
-	User     string `env:"DB_USER"`
-	Database string `env:"DB_DATABASE"`
+	Port        int    `env:"DB_PORT"`
+	Host        string `env:"DB_HOST"`
+	Password    string `env:"DB_PASSWORD"`
+	User        string `env:"DB_USER"`
+	Database    string `env:"DB_DATABASE"`
+	DefaultUser DefaultUserConfig
+}
+
+type DefaultUserConfig struct {
+	Name     string `env:"DEFAULT_USER_NAME"`
+	Password string `env:"DEFAULT_USER_PASSWORD"`
+	Email    string `env:"DEFAULT_USER_EMAIL"`
 }
 
 func LoadConfig() (*AppConfig, error) {

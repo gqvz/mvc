@@ -48,9 +48,7 @@ func CreateUser(name string, email string, passwordHash string, role Role) (*Use
 
 func GetUserByEmailOrUsername(email string, name string) (*User, error) {
 	var user User
-	err := DB.QueryRow("SELECT id, name, email, password_hash, role FROM Users WHERE email = ? OR name = ? LIMIT 1;", email, name).Scan(
-		&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role,
-	)
+	err := scanUserRow(DB.QueryRow("SELECT id, name, email, password_hash, role FROM Users WHERE email = ? OR name = ? LIMIT 1;", email, name), &user)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -62,9 +60,7 @@ func GetUserByEmailOrUsername(email string, name string) (*User, error) {
 
 func GetUserById(id int64) (*User, error) {
 	var user User
-	err := DB.QueryRow("SELECT id, name, email, password_hash, role FROM Users WHERE id = ? LIMIT 1;", id).Scan(
-		&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role,
-	)
+	err := scanUserRow(DB.QueryRow("SELECT id, name, email, password_hash, role FROM Users WHERE id = ? LIMIT 1;", id), &user)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -90,7 +86,7 @@ func GetUsers(search string, role Role, limit int, offset int) ([]User, error) {
 		var users []User
 		for rows.Next() {
 			var user User
-			if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role); err != nil {
+			if err := scanUser(rows, &user); err != nil {
 				return nil, err
 			}
 			users = append(users, user)
@@ -122,7 +118,7 @@ func GetUsers(search string, role Role, limit int, offset int) ([]User, error) {
 	var users []User
 	for rows.Next() {
 		var user User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role); err != nil {
+		if err := scanUser(rows, &user); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -133,4 +129,18 @@ func GetUsers(search string, role Role, limit int, offset int) ([]User, error) {
 func AddUserRole(id int64, role Role) error {
 	_, err := DB.Exec("UPDATE Users SET role = role | ? WHERE id = ?", role, id)
 	return err
+}
+
+func scanUser(rows *sql.Rows, user *User) error {
+	if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role); err != nil {
+		return err
+	}
+	return nil
+}
+
+func scanUserRow(row *sql.Row, user *User) error {
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role); err != nil {
+		return err
+	}
+	return nil
 }

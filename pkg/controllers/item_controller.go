@@ -27,7 +27,7 @@ type CreateItemRequest struct {
 }
 
 type CreateItemResponse struct {
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 }
 
 // @Summary Create item
@@ -57,13 +57,12 @@ func (c *ItemController) CreateItemHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if req.Name == "" || req.Price <= 0 {
-		http.Error(w, "Name and price are required", http.StatusBadRequest)
-		return
-	}
-
 	var tags []models.Tag
 	allTags, err := models.GetTags()
+	if err != nil {
+		http.Error(w, "Failed to get tags", http.StatusInternalServerError)
+		return
+	}
 	for _, tagName := range req.Tags {
 		found := false
 		for _, tag := range allTags {
@@ -78,10 +77,6 @@ func (c *ItemController) CreateItemHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	}
-	if err != nil {
-		http.Error(w, "Failed to get tags", http.StatusInternalServerError)
-		return
-	}
 
 	item, err := models.CreateItem(r.Context(), req.Name, req.Description, req.Price, tags, req.ImageURL, req.Available)
 	if err != nil {
@@ -92,7 +87,7 @@ func (c *ItemController) CreateItemHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	response := CreateItemResponse{Id: item.ID}
+	response := CreateItemResponse{ID: item.ID}
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
@@ -102,7 +97,7 @@ func (c *ItemController) CreateItemHandler(w http.ResponseWriter, r *http.Reques
 }
 
 type GetItemResponse struct {
-	Id          int64        `json:"id"`
+	ID          int64        `json:"id"`
 	Name        string       `json:"name"`
 	Description string       `json:"description"`
 	Price       float64      `json:"price"`
@@ -152,7 +147,7 @@ func (c *ItemController) GetItemHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	response := GetItemResponse{
-		Id:          item.ID,
+		ID:          item.ID,
 		Name:        item.Name,
 		Description: item.Description,
 		Price:       item.Price,
@@ -259,7 +254,7 @@ func (c *ItemController) GetItemsHandler(w http.ResponseWriter, r *http.Request)
 	responseItems := make([]GetItemResponse, len(items))
 	for i, item := range items {
 		responseItems[i] = GetItemResponse{
-			Id:          item.ID,
+			ID:          item.ID,
 			Name:        item.Name,
 			Description: item.Description,
 			Price:       item.Price,

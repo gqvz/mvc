@@ -10,7 +10,7 @@ import (
 )
 
 type Claims struct {
-	UserId int64 `json:"user_id"`
+	UserID int64 `json:"user_id"`
 	Role   byte  `json:"role"`
 	jwt.RegisteredClaims
 }
@@ -47,7 +47,7 @@ func CreateAuthenticationMiddleware(jwtSecret string) func(next http.Handler) ht
 
 			if claims, ok := token.Claims.(*Claims); ok {
 				ctx := r.Context()
-				ctx = context.WithValue(ctx, "userid", claims.UserId)
+				ctx = context.WithValue(ctx, "userid", claims.UserID)
 				ctx = context.WithValue(ctx, "role", claims.Role)
 
 				r = r.WithContext(ctx)

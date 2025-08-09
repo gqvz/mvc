@@ -74,7 +74,7 @@ func (ac *TokenController) CreateTokenHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, middlewares.Claims{
-		UserId: user.ID,
+		UserID: user.ID,
 		Role:   byte(user.Role),
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "mvc",

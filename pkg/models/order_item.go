@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+)
 
 type ItemStatus string
 
@@ -68,7 +71,7 @@ func GetItemsByOrderId(orderId int64, userId int64) (*[]OrderItem, error) {
 	var items []OrderItem
 	for rows.Next() {
 		var item OrderItem
-		if err := rows.Scan(&item.ID, &item.OrderID, &item.ItemID, &item.Quantity, &item.CustomInstructions, &item.Status); err != nil {
+		if err := scanOrderItem(rows, &item); err != nil {
 			return nil, fmt.Errorf("failed to scan order item: %w", err)
 		}
 		items = append(items, item)
@@ -91,7 +94,7 @@ func GetOrderItems(status ItemStatus, limit int, offset int) ([]OrderItem, error
 	var items []OrderItem
 	for rows.Next() {
 		var item OrderItem
-		if err := rows.Scan(&item.ID, &item.OrderID, &item.ItemID, &item.Quantity, &item.CustomInstructions, &item.Status); err != nil {
+		if err := scanOrderItem(rows, &item); err != nil {
 			return nil, err
 		}
 		items = append(items, item)
@@ -102,4 +105,11 @@ func GetOrderItems(status ItemStatus, limit int, offset int) ([]OrderItem, error
 	}
 
 	return items, nil
+}
+
+func scanOrderItem(rows *sql.Rows, item *OrderItem) error {
+	if err := rows.Scan(&item.ID, &item.OrderID, &item.ItemID, &item.Quantity, &item.CustomInstructions, &item.Status); err != nil {
+		return fmt.Errorf("failed to scan order item: %w", err)
+	}
+	return nil
 }

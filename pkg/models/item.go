@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 )
@@ -54,7 +55,7 @@ func CreateItem(ctx context.Context, name string, description string, price floa
 	args := make([]any, 0, len(tags)*2)
 	for _, tag := range tags {
 		query += "(?, ?),"
-		args = append(args, id, tag.Id)
+		args = append(args, id, tag.ID)
 	}
 	if len(tags) > 0 {
 		query = query[:len(query)-1]
@@ -106,7 +107,7 @@ func EditItem(ctx context.Context, id int64, name string, description string, pr
 	args := make([]any, 0, len(tags)*2)
 	for _, tag := range tags {
 		query += "(?, ?),"
-		args = append(args, id, tag.Id)
+		args = append(args, id, tag.ID)
 	}
 	if len(tags) > 0 {
 		query = query[:len(query)-1]
@@ -159,15 +160,8 @@ func GetItemById(id int64) (*Item, error) {
 
 	var item Item
 	if rows.Next() {
-		var tagsJSON string
-		if err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Available, &item.ImageURL, &tagsJSON); err != nil {
+		if err := scanItem(rows, &item); err != nil {
 			return nil, err
-		}
-
-		if tagsJSON != "[]" {
-			if err := json.Unmarshal([]byte(tagsJSON), &item.Tags); err != nil {
-				return nil, fmt.Errorf("failed to read tags: %v", err)
-			}
 		}
 		return &item, nil
 	} else {
@@ -199,7 +193,7 @@ func GetItems(tags []Tag, search string, available bool, limit int, offset int) 
 		query += "WHERE Items.id IN (SELECT item_id FROM ItemTags WHERE tag_id IN ("
 		for i := range tags {
 			query += "?,"
-			args = append(args, tags[i].Id)
+			args = append(args, tags[i].ID)
 		}
 		query = query[:len(query)-1] + ")) "
 	} else {
@@ -216,15 +210,8 @@ func GetItems(tags []Tag, search string, available bool, limit int, offset int) 
 	var items []Item
 	for rows.Next() {
 		var item Item
-		var tagsJSON string
-		if err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Available, &item.ImageURL, &tagsJSON); err != nil {
+		if err := scanItem(rows, &item); err != nil {
 			return nil, err
-		}
-
-		if tagsJSON != "[]" {
-			if err := json.Unmarshal([]byte(tagsJSON), &item.Tags); err != nil {
-				return nil, fmt.Errorf("failed to read tags: %v", err)
-			}
 		}
 		items = append(items, item)
 	}
@@ -252,18 +239,26 @@ func GetItemByIdBulk(ids []int64) (*[]Item, error) {
 	var items []Item
 	for rows.Next() {
 		var item Item
-		var tagsJSON string
-		if err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Available, &item.ImageURL, &tagsJSON); err != nil {
+		if err := scanItem(rows, &item); err != nil {
 			return nil, err
 		}
 
-		if tagsJSON != "[]" {
-			if err := json.Unmarshal([]byte(tagsJSON), &item.Tags); err != nil {
-				return nil, fmt.Errorf("failed to read tags: %v", err)
-			}
-		}
 		items = append(items, item)
 	}
 
 	return &items, nil
+}
+
+func scanItem(rows *sql.Rows, item *Item) error {
+	var tagsJSON string
+	if err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Available, &item.ImageURL, &tagsJSON); err != nil {
+		return fmt.Errorf("failed to scan item: %w", err)
+	}
+
+	if tagsJSON != "[]" {
+		if err := json.Unmarshal([]byte(tagsJSON), &item.Tags); err != nil {
+			return fmt.Errorf("failed to read tags: %v", err)
+		}
+	}
+	return nil
 }

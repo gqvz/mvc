@@ -98,8 +98,8 @@ func RegisterItemRoutes(router *mux.Router) {
 	getItemsHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetItemsHandler))
 	router.Handle("/items", getItemsHandler).Methods("GET")
 
-	editTagHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.EditItemHandler))
-	router.Handle("/items/{id:[0-9]+}", editTagHandler).Methods("PUT")
+	editItemHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.EditItemHandler))
+	router.Handle("/items/{id:[0-9]+}", editItemHandler).Methods("PUT")
 }
 
 func RegisterRequestRoutes(router *mux.Router) {

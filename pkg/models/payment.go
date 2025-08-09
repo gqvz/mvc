@@ -23,7 +23,6 @@ type Payment struct {
 }
 
 func CreatePayment(orderId int64, subtotal float64, tip float64, cashierId int64, userId int64) (*Payment, error) {
-	// why did i add userid to the table
 	res, err := DB.Exec("INSERT INTO Payments (order_id, user_id, order_subtotal, tip, status, cashier_id) VALUES (?, ?, ?, ?, ?, ?)", orderId, userId, subtotal, tip, Processing, cashierId)
 	if err != nil {
 		return nil, err
@@ -45,7 +44,6 @@ func CreatePayment(orderId int64, subtotal float64, tip float64, cashierId int64
 	}, nil
 }
 
-// oh i see why
 func GetPaymentByID(paymentId int64, userId int64) (*Payment, error) {
 	row := DB.QueryRow("SELECT id, order_id, order_subtotal, tip, status, cashier_id FROM Payments WHERE id = ? AND (user_id = ? OR ? = 0)", paymentId, userId, userId)
 	payment := &Payment{}

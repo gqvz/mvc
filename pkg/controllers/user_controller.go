@@ -195,7 +195,7 @@ type GetUserResponse struct {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param id path int false "User ID"
+// @Param id path int true "User ID"
 // @Security jwt
 // @Security cookie
 // @Success 200 {object} GetUserResponse

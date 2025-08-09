@@ -41,7 +41,7 @@ func CreateAuthenticationMiddleware(jwtSecret string) func(next http.Handler) ht
 			})
 
 			if err != nil || !token.Valid {
-				next.ServeHTTP(w, r)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
 

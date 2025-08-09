@@ -21,7 +21,7 @@ type CreateTagRequest struct {
 }
 
 type CreateTagResponse struct {
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 }
 
 // @Summary Create tag
@@ -36,6 +36,7 @@ type CreateTagResponse struct {
 // @Failure 400 {object} string "Bad request, invalid tag name"
 // @Failure 401 {object} string "Unauthorized, invalid token"
 // @Failure 403 {object} string "Forbidden, you are not allowed to create tags"
+// @Failure 409 {object} string "Conflict, tag with the same name already exists"
 // @Failure 500 {object} string "Internal server error"
 // @Router /tags [post]
 func (c *TagController) CreateTagHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,12 +53,16 @@ func (c *TagController) CreateTagHandler(w http.ResponseWriter, r *http.Request)
 
 	tag, err := models.CreateTag(req.Name)
 	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate") {
+			http.Error(w, "Tag with the same name already exists", http.StatusConflict)
+			return
+		}
 		http.Error(w, "Failed to create tag", http.StatusInternalServerError)
 		return
 	}
 
 	response := CreateTagResponse{
-		Id: tag.Id,
+		ID: tag.ID,
 	}
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
@@ -68,7 +73,7 @@ func (c *TagController) CreateTagHandler(w http.ResponseWriter, r *http.Request)
 }
 
 type GetTagResponse struct {
-	Id   int64  `json:"id"`
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -107,7 +112,7 @@ func (c *TagController) GetTagHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := GetTagResponse{
-		Id:   tag.Id,
+		ID:   tag.ID,
 		Name: tag.Name,
 	}
 
@@ -141,7 +146,7 @@ func (c *TagController) GetTagsHandler(w http.ResponseWriter, r *http.Request) {
 	var tagResponses []GetTagResponse
 	for _, tag := range tags {
 		tagResponses = append(tagResponses, GetTagResponse{
-			Id:   tag.Id,
+			ID:   tag.ID,
 			Name: tag.Name,
 		})
 	}
@@ -171,6 +176,7 @@ type EditTagResponse = GetTagResponse
 // @Failure 401 {object} string "Unauthorized, invalid token"
 // @Failure 403 {object} string "Forbidden, you are not allowed to edit
 // @Failure 404 {object} string "Tag not found"
+// @Failure 409 {object} string "Conflict, tag with the same name already exists"
 // @Failure 500 {object} string "Internal server error"
 // @Router /tags/{id} [put]
 func (c *TagController) EditTagHandler(w http.ResponseWriter, r *http.Request) {
@@ -198,13 +204,16 @@ func (c *TagController) EditTagHandler(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(err.Error(), "not found") {
 			http.Error(w, "Tag not found", http.StatusNotFound)
 			return
+		} else if strings.Contains(err.Error(), "Duplicate") {
+			http.Error(w, "Tag with the same name already exists", http.StatusConflict)
+			return
 		}
 		http.Error(w, "Failed to edit tag", http.StatusInternalServerError)
 		return
 	}
 
 	response := EditTagResponse{
-		Id:   tag.Id,
+		ID:   tag.ID,
 		Name: tag.Name,
 	}
 

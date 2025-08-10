@@ -18,15 +18,15 @@ func CreateRequestController() *RequestController {
 
 type CreateRequestRequest struct {
 	Role models.Role `json:"role" example:"3"`
-}
+} // @name CreateRequestRequest
 
 // @Summary Create request
+// @ID createRequest
 // @Description Create a new request for a role
 // @Tags requests
 // @Accept json
 // @Param request body CreateRequestRequest true "Request data"
 // @Security jwt
-// @Security cookie
 // @Success 201 {object} string "Request created successfully"
 // @Failure 400 {object} string "Bad request, invalid request data"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -59,9 +59,10 @@ func (c *RequestController) CreateRequestHandler(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusCreated)
 }
 
-type GetRequestResponse = models.Request
+type GetRequestResponse = models.Request // @name GetRequestResponse
 
 // @Summary Get requests
+// @ID getRequests
 // @Description Get requests filtered by user, role, status
 // @Tags requests
 // @Accept json
@@ -72,7 +73,6 @@ type GetRequestResponse = models.Request
 // @Param limit query int false "Number of requests to return"
 // @Param offset query int false "Offset for pagination"
 // @Security jwt
-// @Security cookie
 // @Success 200 {array} GetRequestResponse "List of requests"
 // @Success 204 {object} string "No content, no requests found"
 // @Failure 400 {object} string "Bad request, invalid query parameters"
@@ -163,12 +163,12 @@ func (c *RequestController) GetRequestsHandler(w http.ResponseWriter, r *http.Re
 }
 
 // @Summary Grant Request
+// @ID grantRequest
 // @Description Grant a request for a role
 // @Tags requests
 // @Accept json
 // @Param id path int true "Request ID"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} string "Request granted successfully"
 // @Failure 400 {object} string "Bad request, invalid request ID"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -216,12 +216,12 @@ func (c *RequestController) GrantRequestHandler(w http.ResponseWriter, r *http.R
 }
 
 // @Summary Reject Request
+// @ID rejectRequest
 // @Description Reject a request for a role
 // @Tags requests
 // @Accept json
 // @Param id path int true "Request ID"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} string "Request rejected successfully"
 // @Failure 400 {object} string "Bad request, invalid request ID"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -257,12 +257,12 @@ func (c *RequestController) RejectRequestHandler(w http.ResponseWriter, r *http.
 }
 
 // @Summary Mark Request as Seen
+// @ID markRequestSeen
 // @Description Mark a request as seen by the user
 // @Tags requests
 // @Accept json
 // @Param id path int true "Request ID"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} string "Request marked as seen successfully"
 // @Failure 400 {object} string "Bad request, invalid request ID"
 // @Failure 401 {object} string "Unauthorized, invalid token"

@@ -20,19 +20,19 @@ type CreatePaymentRequest struct {
 	OrderID   int64   `json:"order_id"`
 	Tip       float64 `json:"tip"`
 	CashierID int64   `json:"cashier_id"`
-}
+} // @name CreatePaymentRequest
 
 type CreatePaymentResponse struct {
 	PaymentID int64 `json:"payment_id"`
-}
+} // @name CreatePaymentResponse
 
 // @Summary Create a new payment
+// @ID createPayment
 // @Description Create a new payment
 // @Tags payments
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Param request body CreatePaymentRequest true "Create Payment Request"
 // @Success 201 {object} CreatePaymentResponse
 // @Failure 400 {object} string "Bad Request"
@@ -108,15 +108,15 @@ func (c *PaymentController) CreatePaymentHandler(w http.ResponseWriter, r *http.
 	}
 }
 
-type GetPaymentResponse = models.Payment
+type GetPaymentResponse = models.Payment // @name GetPaymentResponse
 
 // @Summary Get a payment by ID
+// @ID getPaymentById
 // @Description Get a payment by ID
 // @Tags payments
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Param id path int true "Payment ID"
 // @Success 200 {object} GetPaymentResponse
 // @Failure 400 {object} string "Bad Request"
@@ -166,12 +166,12 @@ func (c *PaymentController) GetPaymentHandler(w http.ResponseWriter, r *http.Req
 }
 
 // @Summary Get payments
+// @ID getPayments
 // @Description Get all payments with filters
 // @Tags payments
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Param status query string false "Payment status"
 // @Param limit query int false "Limit"
 // @Param offset query int false "Offset"
@@ -245,15 +245,15 @@ func (c *PaymentController) GetPaymentsHandler(w http.ResponseWriter, r *http.Re
 
 type EditPaymentStatusRequest struct {
 	Status models.PaymentStatus `json:"status"`
-}
+} // @name EditPaymentStatusRequest
 
 // @Summary Edit payment status
+// @ID editPaymentStatus
 // @Description Edit payment status
 // @Tags payments
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Param id path int true "Payment ID"
 // @Param request body EditPaymentStatusRequest true "Edit Payment Status Request"
 // @Success 200 {object} string "Payment status updated"

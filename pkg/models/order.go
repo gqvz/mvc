@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type OrderStatus string
+type OrderStatus string // @name OrderStatus
 
 const (
 	Open   OrderStatus = "open"
@@ -18,7 +18,7 @@ type Order struct {
 	Status      OrderStatus `json:"status"`
 	TableNumber int         `json:"table_number"`
 	OrderedAt   time.Time   `json:"ordered_at"`
-}
+} // @name Order
 
 func CreateOrder(userId int64, tableNumber int) (*Order, error) {
 	result, err := DB.Exec("INSERT INTO Orders (customer_id, status, table_number, ordered_at) SELECT ?, 'open', ?, ? WHERE NOT EXISTS (SELECT 1 FROM Orders WHERE table_number = ? AND status = 'open')", userId, tableNumber, time.Now(), tableNumber)

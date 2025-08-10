@@ -15,7 +15,7 @@ type Item struct {
 	Tags        []Tag   `json:"tags"`
 	ImageURL    string  `json:"image_url"`
 	Available   bool    `json:"available"`
-}
+} // @name Item
 
 func CreateItem(ctx context.Context, name string, description string, price float64, tags []Tag, imageURL string, available bool) (*Item, error) {
 	tx, err := DB.BeginTx(ctx, nil)

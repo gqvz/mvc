@@ -5,13 +5,13 @@ import (
 	"errors"
 )
 
-type Role byte
+type Role byte // @name Role
 
 const (
-	Any Role = iota
-	Customer
-	Chef
-	Admin = Customer | Chef
+	Any      Role              = iota // @name Any
+	Customer                          // @name Customer
+	Chef                              // @name Chef
+	Admin    = Customer | Chef        // @name Admin
 )
 
 func (r Role) HasFlag(flag Role) bool {
@@ -24,7 +24,7 @@ type User struct {
 	Email        string `json:"email"`
 	PasswordHash string `json:"password_hash"`
 	Role         Role   `json:"role"`
-}
+} // @name User
 
 func CreateUser(name string, email string, passwordHash string, role Role) (*User, error) {
 	result, err := DB.Exec("INSERT INTO Users (name, email, password_hash, role) VALUES (?, ?, ?, ?)", name, email, passwordHash, role)

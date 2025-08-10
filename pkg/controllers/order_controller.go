@@ -19,19 +19,19 @@ func CreateOrderController() *OrderController {
 
 type CreateOrderRequest struct {
 	TableNumber int `json:"table_number"`
-}
+} // @name CreateOrderRequest
 
 type CreateOrderResponse struct {
 	OrderID int64 `json:"order_id"`
-}
+} // @name CreateOrderResponse
 
 // @Summary Create a new order
+// @ID createOrder
 // @Description Create a new order
 // @Tags orders
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Param request body CreateOrderRequest true "Create Order Request"
 // @Success 200 {object} CreateOrderResponse
 // @Failure 400 {object} string "Bad Request"
@@ -75,10 +75,10 @@ func (c *OrderController) CreateOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Summary Close an order
+// @ID closeOrderById
 // @Description Close an order by ID
 // @Tags orders
 // @Security jwt
-// @Security cookie
 // @Param id path int true "Order ID"
 // @Success 204 "No Content"
 // @Failure 400 {object} string "Bad Request"
@@ -121,13 +121,13 @@ func (c *OrderController) CloseOrder(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-type GetOrderResponse = models.Order
+type GetOrderResponse = models.Order // @name GetOrderResponse
 
 // @Summary Get order by ID
+// @ID getOrderById
 // @Description Get an order by its ID
 // @Tags orders
 // @Security jwt
-// @Security cookie
 // @Param id path int true "Order ID"
 // @Success 200 {object} GetOrderResponse "Order details"
 // @Failure 400 {object} string "Bad Request"
@@ -173,10 +173,10 @@ func (c *OrderController) GetOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Summary Get orders
+// @ID getOrders
 // @Description Get order filtered by table number, date, user, status
 // @Tags orders
 // @Security jwt
-// @Security cookie
 // @Param table_number query int false "Table number"
 // @Param date query string false "Date in format YYYY-MM-DD"
 // @Param user_id query int false "User ID"

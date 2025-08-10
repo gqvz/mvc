@@ -18,20 +18,20 @@ func CreateTagController() *TagController {
 
 type CreateTagRequest struct {
 	Name string `json:"name" example:"real"`
-}
+} // @name CreateTagRequest
 
 type CreateTagResponse struct {
 	ID int64 `json:"id"`
-}
+} // @name CreateTagResponse
 
 // @Summary Create tag
+// @ID createTag
 // @Description Create a new tag
 // @Tags tags
 // @Accept json
 // @Produce json
 // @Param tag body CreateTagRequest true "Tag request"
 // @Security jwt
-// @Security cookie
 // @Success 201 {object} CreateTagResponse "Created tag"
 // @Failure 400 {object} string "Bad request, invalid tag name"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -75,16 +75,16 @@ func (c *TagController) CreateTagHandler(w http.ResponseWriter, r *http.Request)
 type GetTagResponse struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
-}
+} // @name GetTagResponse
 
 // @Summary Get tag by ID
+// @ID getTagById
 // @Description Get a tag by its ID
 // @Tags tags
 // @Accept json
 // @Produce json
 // @Param id path int true "Tag ID"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} GetTagResponse "Tag details"
 // @Failure 400 {object} string "Bad request, invalid tag ID"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -125,12 +125,12 @@ func (c *TagController) GetTagHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Summary Get tags
+// @ID getTags
 // @Description Get all tags
 // @Tags tags
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Success 200 {array} GetTagResponse "List of tags"
 // @Failure 401 {object} string "Unauthorized, invalid token"
 // @Failure 403 {object} string "Forbidden, you are not allowed to view tags"
@@ -159,10 +159,11 @@ func (c *TagController) GetTagsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type EditTagRequest = CreateTagRequest
-type EditTagResponse = GetTagResponse
+type EditTagRequest = CreateTagRequest // @name EditTagRequest
+type EditTagResponse = GetTagResponse  // @name EditTagResponse
 
 // @Summary Edit tag
+// @ID editTag
 // @Description Edit an existing tag
 // @Tags tags
 // @Accept json
@@ -170,7 +171,6 @@ type EditTagResponse = GetTagResponse
 // @Param id path int true "Tag ID"
 // @Param tag body EditTagRequest true "Tag request"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} EditTagResponse "Updated tag"
 // @Failure 400 {object} string "Bad request, invalid tag name or ID
 // @Failure 401 {object} string "Unauthorized, invalid token"

@@ -24,20 +24,20 @@ type CreateItemRequest struct {
 	ImageURL    string   `json:"image_url" example:"https://http.cat/404"`
 	Tags        []string `json:"tags" example:"real,tag"`
 	Available   bool     `json:"available" example:"true"`
-}
+} // @name CreateItemRequest
 
 type CreateItemResponse struct {
 	ID int64 `json:"id"`
-}
+} // @name CreateItemResponse
 
 // @Summary Create item
+// @ID createItem
 // @Description Create a new item
 // @Tags items
 // @Accept json
 // @Produce json
 // @Param item body CreateItemRequest true "Item request"
 // @Security jwt
-// @Security cookie
 // @Success 201 {object} CreateItemResponse "Created item"
 // @Failure 400 {object} string "Bad request, invalid item data"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -104,16 +104,16 @@ type GetItemResponse struct {
 	Tags        []models.Tag `json:"tags"`
 	ImageURL    string       `json:"image_url"`
 	Available   bool         `json:"available"`
-}
+} // @name GetItemResponse
 
 // @Summary Get item by ID
+// @ID getItemById
 // @Description Get an item by its ID
 // @Tags items
 // @Accept json
 // @Produce json
 // @Param id path int true "Item ID"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} GetItemResponse "Item details"
 // @Failure 400 {object} string "Bad request, invalid item ID"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -165,6 +165,7 @@ func (c *ItemController) GetItemHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 // @Summary Get items
+// @ID getItems
 // @Description Get all items with optional filters
 // @Tags items
 // @Accept json
@@ -175,7 +176,6 @@ func (c *ItemController) GetItemHandler(w http.ResponseWriter, r *http.Request) 
 // @Param limit query int false "Limit number of items returned"
 // @Param offset query int false "Offset for pagination"
 // @Security jwt
-// @Security cookie
 // @Success 200 {array} GetItemResponse "List of items"
 // @Failure 400 {object} string "Bad request, invalid parameters"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -272,16 +272,16 @@ func (c *ItemController) GetItemsHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-type EditItemRequest = CreateItemRequest
+type EditItemRequest = CreateItemRequest // @name EditItemRequest
 
 // @Summary Edit item
+// @ID editItem
 // @Description Edit an existing item
 // @Tags items
 // @Accept json
 // @Param id path int true "Item ID"
 // @Param item body EditItemRequest true "Item request"
 // @Security jwt
-// @Security cookie
 // @Success 200 "Edited item"
 // @Failure 400 {object} string "Bad request, invalid item data"
 // @Failure 401 {object} string "Unauthorized, invalid token"

@@ -20,19 +20,19 @@ type CreateOrderItemRequest struct {
 	ItemID             int64  `json:"item_id"`
 	Quantity           int    `json:"quantity"`
 	CustomInstructions string `json:"custom_instructions"`
-}
+} // @name CreateOrderItemRequest
 
 type CreateOrderItemResponse struct {
 	OrderItemID int64 `json:"order_item_id"`
-}
+} // @name CreateOrderItemResponse
 
 // @Summary Create a new order item
+// @ID createOrderItem
 // @Description Create a new order item
 // @Tags order_items
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Param id path int true "Order ID"
 // @Param request body CreateOrderItemRequest true "Create Order Item Request"
 // @Success 200 {object} CreateOrderItemResponse
@@ -87,15 +87,15 @@ func (c *OrderItemController) CreateOrderItem(w http.ResponseWriter, r *http.Req
 
 type EditOrderItemStatusRequest struct {
 	Status models.ItemStatus `json:"status"`
-}
+} // @name EditOrderItemStatusRequest
 
 // @Summary Edit an order item status
+// @ID editOrderItemStatus
 // @Description Edit the status of an order item
 // @Tags order_items
 // @Accept json
 // @Produce json
 // @Security jwt
-// @Security cookie
 // @Param id path int true "Order Item ID"
 // @Param status body EditOrderItemStatusRequest true "New status"
 // @Success 200 {object} string "Order item status updated"
@@ -143,13 +143,13 @@ func (c *OrderItemController) EditOrderItemStatus(w http.ResponseWriter, r *http
 	}
 }
 
-type GetOrderItemResponse = models.OrderItem
+type GetOrderItemResponse = models.OrderItem // @name GetOrderItemResponse
 
 // @Summary Get order items
+// @ID getOrderItems
 // @Description Get all items in an order
 // @Tags order_items
 // @Security jwt
-// @Security cookie
 // @Param id path int true "Order ID"
 // @Success 200 {array} GetOrderItemResponse "List of order items"
 // @Success 204 {object} string "No Content"
@@ -196,10 +196,10 @@ func (c *OrderItemController) GetOrderItems(w http.ResponseWriter, r *http.Reque
 }
 
 // @Summary Get order items by status
+// @ID getOrderItemsByStatus
 // @Description Get all items in an order by status
 // @Tags order_items
 // @Security jwt
-// @Security cookie
 // @Param limit query int false "Limit the number of items returned"
 // @Param offset query int false "Offset for pagination"
 // @Param status query string false "Filter by item status (preparing, completed)"

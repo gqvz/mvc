@@ -22,19 +22,14 @@ import (
 // @version         1.0
 // @description     MVC Assignment
 
-// @servers      localhost:3000
-// @servers      206.189.128.208:3000
-// @BasePath  /api
+// @host 	     mvc.gqvz.xyz
+// @BasePath     /api
+// @schemes      https
 
 // @securityDefinitions.apikey jwt
 // @in header
 // @name Authorization
 // @description JWT token in Authorization header
-
-// @securityDefinitions.apikey cookie
-// @in cookie
-// @name jwt
-// @description JWT token stored in cookie
 func main() {
 	appConfig, err := config.LoadConfig()
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type PaymentStatus string
+type PaymentStatus string // @name PaymentStatus
 
 const (
 	Processing PaymentStatus = "processing"
@@ -20,7 +20,7 @@ type Payment struct {
 	Total     float64       `json:"total"`
 	Status    PaymentStatus `json:"status"`
 	CashierID int64         `json:"cashier_id"`
-}
+} // @name Payment
 
 func CreatePayment(orderId int64, subtotal float64, tip float64, cashierId int64, userId int64) (*Payment, error) {
 	res, err := DB.Exec("INSERT INTO Payments (order_id, user_id, order_subtotal, tip, status, cashier_id) VALUES (?, ?, ?, ?, ?, ?)", orderId, userId, subtotal, tip, Processing, cashierId)

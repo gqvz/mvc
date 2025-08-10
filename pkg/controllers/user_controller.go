@@ -21,13 +21,14 @@ type CreateUserRequest struct {
 	Name     string `json:"name" example:"real"`
 	Password string `json:"password" example:"realpassword"`
 	Email    string `json:"email" example:"real@real.com"`
-}
+} // @name CreateUserRequest
 
 type CreateUserResponse struct {
 	ID int64 `json:"id" example:"1"`
-}
+} // @name CreateUserResponse
 
 // @Summary Create a new user
+// @ID createUser
 // @Description Create a new user with the provided information
 // @Tags users
 // @Accept json
@@ -87,13 +88,14 @@ type EditUserRequest struct {
 	Email    string      `json:"email" example:"real@real.com"`
 	Password string      `json:"password" example:"realpassword"`
 	Role     models.Role `json:"role" example:"1"`
-}
+} // @name EditUserRequest
 
 type EditUserResponse struct {
 	Message string `json:"message" example:"User edited successfully"`
-}
+} // @name EditUserResponse
 
 // @Summary Edit an existing user
+// @ID editUser
 // @Description Edit an existing user with the provided information
 // @Tags users
 // @Accept json
@@ -101,7 +103,6 @@ type EditUserResponse struct {
 // @Param id path int true "User ID"
 // @Param user body EditUserRequest true "Updated user information"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} EditUserResponse
 // @Failure 400 {object} string "Bad request, missing or invalid parameters"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -188,16 +189,16 @@ type GetUserResponse struct {
 	Name  string      `json:"name" example:"real"`
 	Email string      `json:"email" example:"real@real.com"`
 	Role  models.Role `json:"role" example:"1"`
-}
+} // @name GetUserResponse
 
 // @Summary Get user by ID
+// @ID getUserById
 // @Description Get user information by user ID
 // @Tags users
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} GetUserResponse
 // @Failure 400 {object} string "Bad request, invalid user ID"
 // @Failure 401 {object} string "Unauthorized, invalid token"
@@ -245,6 +246,7 @@ func (uc *UserController) GetUserHandler(w http.ResponseWriter, r *http.Request)
 }
 
 // @Summary Get users
+// @ID getUsers
 // @Description Get user using name, email, role
 // @Tags users
 // @Accept json
@@ -254,7 +256,6 @@ func (uc *UserController) GetUserHandler(w http.ResponseWriter, r *http.Request)
 // @Param limit query int false "Limit the number of users returned"
 // @Param offset query int false "Offset for pagination"
 // @Security jwt
-// @Security cookie
 // @Success 200 {object} []GetUserResponse "List of users"
 // @Failure 400 {object} string "Bad request, invalid user ID"
 // @Failure 401 {object} string "Unauthorized, invalid token"

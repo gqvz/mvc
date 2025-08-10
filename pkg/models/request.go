@@ -5,14 +5,14 @@ import (
 	"strings"
 )
 
-type UserSeenStatus string
+type UserSeenStatus string // @name UserSeenStatus
 
 const (
 	Seen   UserSeenStatus = "seen"
-	Unseen UserSeenStatus = "unseen" // whytf did i name this unseen
+	Unseen UserSeenStatus = "unseen"
 )
 
-type RequestStatus string
+type RequestStatus string // @name RequestStatus
 
 const (
 	Pending  RequestStatus = "pending"
@@ -26,7 +26,7 @@ type Request struct {
 	Role       Role           `json:"role"`
 	Status     RequestStatus  `json:"status"`
 	UserStatus UserSeenStatus `json:"user_status"`
-}
+} // @name Request
 
 func CreateRequest(userID int64, role Role) (*Request, error) {
 	res, err := DB.Exec("INSERT INTO Requests (user_id, role, status, user_status) VALUES (?, ?, ?, ?)", userID, role, Pending, Unseen)

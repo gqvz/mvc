@@ -23,13 +23,14 @@ func CreateTokenController() *TokenController {
 type CreateTokenRequest struct {
 	Username string `json:"username" example:"real"`
 	Password string `json:"password" example:"realpassword"`
-}
+} // @name CreateTokenRequest
 
 type CreateTokenResponse struct {
 	Token string `json:"token"`
-}
+} // @name CreateTokenResponse
 
 // @Summary Create a new JWT token
+// @ID createToken
 // @Description Create a new JWT token for user authentication
 // @Tags authentication
 // @Accept json
@@ -89,16 +90,6 @@ func (ac *TokenController) CreateTokenHandler(w http.ResponseWriter, r *http.Req
 		http.Error(w, "Error signing token", http.StatusInternalServerError)
 		return
 	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "jwt",
-		Value:    ss,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteStrictMode,
-		Expires:  time.Now().Add(2 * time.Hour),
-	})
 
 	response := CreateTokenResponse{
 		Token: ss,

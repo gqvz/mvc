@@ -68,31 +68,38 @@ func (c *PaymentController) CreatePaymentHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	if orderItems == nil || len(*orderItems) == 0 {
-		http.Error(w, "No items found for the order", http.StatusBadRequest)
-		return
-	}
-
 	subtotal := 0.0
-
-	itemIds := make([]int64, 0, len(*orderItems))
-	for _, item := range *orderItems {
-		itemIds = append(itemIds, item.ItemID)
-	}
-	items, err := models.GetItemByIdBulk(itemIds)
-	if err != nil {
-		http.Error(w, "Failed to retrieve items: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	for i, item := range *orderItems {
-		itemDetails := (*items)[i]
-		subtotal += itemDetails.Price * float64(item.Quantity)
+	if orderItems != nil && len(*orderItems) != 0 {
+		itemIdToDetails := make(map[int64]*models.Item)
+		itemIdsSet := make(map[int64]struct{})
+		for _, item := range *orderItems {
+			itemIdsSet[item.ItemID] = struct{}{}
+		}
+		itemIds := make([]int64, 0, len(itemIdsSet))
+		for id := range itemIdsSet {
+			itemIds = append(itemIds, id)
+		}
+		items, err := models.GetItemByIdBulk(itemIds)
+		if err != nil {
+			http.Error(w, "Failed to retrieve items: ", http.StatusInternalServerError)
+			return
+		}
+		for _, item := range *items {
+			itemIdToDetails[item.ID] = &item
+		}
+		for _, orderItem := range *orderItems {
+			itemDetails, ok := itemIdToDetails[orderItem.ItemID]
+			if !ok {
+				http.Error(w, "Order contains invalid item", http.StatusBadRequest)
+				return
+			}
+			subtotal += itemDetails.Price * float64(orderItem.Quantity)
+		}
 	}
 	payment, err := models.CreatePayment(req.OrderID, subtotal, req.Tip, req.CashierID, userId)
 
 	if err != nil {
-		http.Error(w, "Failed to create payment: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to create payment", http.StatusInternalServerError)
 		return
 	}
 
@@ -232,7 +239,12 @@ func (c *PaymentController) GetPaymentsHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	if payments == nil || len(payments) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		_, err := w.Write([]byte("[]"))
+		if err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
 		return
 	}
 

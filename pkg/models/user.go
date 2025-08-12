@@ -101,8 +101,8 @@ func GetUsers(search string, role Role, limit int, offset int) ([]User, error) {
 		args = append(args, "%"+search+"%", "%"+search+"%")
 	}
 	if role != Any {
-		query += " AND role & ?"
-		args = append(args, role)
+		query += " AND role & ? = ?"
+		args = append(args, role, role)
 	}
 
 	query += " LIMIT ? OFFSET ?"

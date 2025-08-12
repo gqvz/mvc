@@ -183,8 +183,13 @@ func (c *OrderItemController) GetOrderItems(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if orderItems == nil {
-		http.Error(w, "No items found for this order", http.StatusNotFound)
+	if len(*orderItems) == 0 {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		_, err := w.Write([]byte("[]"))
+		if err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -236,7 +241,13 @@ func (c *OrderItemController) GetOrderItemsByStatus(w http.ResponseWriter, r *ht
 	}
 
 	if len(orderItems) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		_, err := w.Write([]byte("[]"))
+		if err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

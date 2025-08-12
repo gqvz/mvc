@@ -64,7 +64,7 @@ func RegisterRoutes(router *mux.Router) {
 
 func RegisterPaymentRoutes(router *mux.Router) {
 	c := controllers.CreatePaymentController()
-	createPaymentHandler := middlewares.Authorize(models.Admin)(http.HandlerFunc(c.CreatePaymentHandler))
+	createPaymentHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.CreatePaymentHandler))
 	router.Handle("/payments", createPaymentHandler).Methods("POST", "OPTIONS")
 
 	getPaymentHandler := middlewares.Authorize(models.Customer)(http.HandlerFunc(c.GetPaymentHandler))

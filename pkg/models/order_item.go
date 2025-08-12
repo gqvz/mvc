@@ -62,7 +62,7 @@ func EditOrderItemStatus(orderItemId int64, status ItemStatus) error {
 }
 
 func GetItemsByOrderId(orderId int64, userId int64) (*[]OrderItem, error) {
-	rows, err := DB.Query("SELECT id, order_id, item_id, count, custom_instructions, status FROM OrderItems WHERE order_id = ? AND EXISTS (SELECT 1 FROM Orders WHERE id = ? AND (customer_id = ? OR ? = 0) AND status = 'open')", orderId, orderId, userId, userId)
+	rows, err := DB.Query("SELECT id, order_id, item_id, count, custom_instructions, status FROM OrderItems WHERE order_id = ? AND EXISTS (SELECT 1 FROM Orders WHERE id = ? AND (customer_id = ? OR ? = 0))", orderId, orderId, userId, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve order items: %w", err)
 	}

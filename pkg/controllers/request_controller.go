@@ -140,7 +140,11 @@ func (c *RequestController) GetRequestsHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	if len(requests) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		_, err2 := w.Write([]byte("[]"))
+		if err2 != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
 		return
 	}
 

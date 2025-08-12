@@ -223,7 +223,7 @@ func (c *OrderController) GetOrders(w http.ResponseWriter, r *http.Request) {
 
 	role := models.Role(r.Context().Value("role").(byte))
 	currentUserId := r.Context().Value("userid").(int64)
-	if !role.HasFlag(models.Admin) {
+	if !role.HasFlag(models.Admin) || userIdStr == "" {
 		userId = currentUserId
 	}
 
@@ -256,6 +256,16 @@ func (c *OrderController) GetOrders(w http.ResponseWriter, r *http.Request) {
 	orders, err := models.GetOrders(userId, status, tableNumber, date, limit, offset)
 	if err != nil {
 		http.Error(w, "Failed to retrieve orders", http.StatusInternalServerError)
+		return
+	}
+
+	if len(orders) == 0 {
+		w.WriteHeader(http.StatusOK)
+		_, err := w.Write([]byte("[]"))
+		if err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 

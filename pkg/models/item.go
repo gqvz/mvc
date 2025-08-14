@@ -7,16 +7,6 @@ import (
 	"fmt"
 )
 
-type Item struct {
-	ID          int64   `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Tags        []Tag   `json:"tags"`
-	ImageURL    string  `json:"image_url"`
-	Available   bool    `json:"available"`
-} // @name Item
-
 func CreateItem(ctx context.Context, name string, description string, price float64, tags []Tag, imageURL string, available bool) (*Item, error) {
 	tx, err := DB.BeginTx(ctx, nil)
 	if err != nil {
@@ -38,6 +28,7 @@ func CreateItem(ctx context.Context, name string, description string, price floa
 	}
 
 	if id == 0 {
+		_ = tx.Rollback()
 		return nil, fmt.Errorf("item with name '%s' already exists", name)
 	}
 
@@ -67,10 +58,11 @@ func CreateItem(ctx context.Context, name string, description string, price floa
 			}
 			return nil, err
 		}
-		err := tx.Commit()
-		if err != nil {
-			return nil, err
-		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
 	}
 
 	return item, nil
@@ -178,8 +170,8 @@ func GetItems(tags []Tag, search string, available bool, limit int, offset int) 
 	       				),
 					']') as tags
 					FROM Items
-					JOIN ItemTags ON ItemTags.item_id = Items.id 
-					JOIN Tags ON ItemTags.tag_id = Tags.id `
+					LEFT JOIN ItemTags ON ItemTags.item_id = Items.id 
+					LEFT JOIN Tags ON ItemTags.tag_id = Tags.id `
 	var args []any
 
 	if search != "" {

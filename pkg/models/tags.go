@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-type Tag struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-} // @name Tag
-
 func CreateTag(name string) (*Tag, error) {
 	var tag Tag
 	res, err := DB.Exec("INSERT INTO Tags (name) VALUES (?);", name)

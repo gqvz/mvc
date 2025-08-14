@@ -5,19 +5,6 @@ import (
 	"errors"
 )
 
-type Role byte // @name Role
-
-const (
-	Any      Role              = iota // @name Any
-	Customer                          // @name Customer
-	Chef                              // @name Chef
-	Admin    = Customer | Chef        // @name Admin
-)
-
-func (r Role) HasFlag(flag Role) bool {
-	return r&flag == flag
-}
-
 type User struct {
 	ID           int64  `json:"id"`
 	Name         string `json:"name"`

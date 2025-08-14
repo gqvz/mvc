@@ -5,22 +5,6 @@ import (
 	"fmt"
 )
 
-type ItemStatus string // @name ItemStatus
-
-const (
-	Preparing ItemStatus = "preparing"
-	Completed ItemStatus = "completed"
-) // @name ItemStatus
-
-type OrderItem struct {
-	ID                 int64      `json:"id"`
-	OrderID            int64      `json:"order_id"`
-	ItemID             int64      `json:"item_id"`
-	Quantity           int        `json:"quantity"`
-	CustomInstructions string     `json:"custom_instructions"`
-	Status             ItemStatus `json:"status"`
-} // @name OrderItem
-
 func CreateOrderItem(orderId int64, userId int64, itemId int64, quantity int, customInstructions string) (*OrderItem, error) {
 	res, err := DB.Exec("INSERT INTO OrderItems (order_id, item_id, count, status, custom_instructions) SELECT ?, ?, ?, ?, ? FROM Orders WHERE id = ? AND customer_id = ? AND status = 'open'", orderId, itemId, quantity, Preparing, customInstructions, orderId, userId)
 	if err != nil {

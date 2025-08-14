@@ -5,29 +5,6 @@ import (
 	"strings"
 )
 
-type UserSeenStatus string // @name UserSeenStatus
-
-const (
-	Seen   UserSeenStatus = "seen"
-	Unseen UserSeenStatus = "unseen"
-)
-
-type RequestStatus string // @name RequestStatus
-
-const (
-	Pending  RequestStatus = "pending"
-	Granted  RequestStatus = "granted"
-	Rejected RequestStatus = "rejected"
-)
-
-type Request struct {
-	ID         int64          `json:"id"`
-	UserID     int64          `json:"user_id"`
-	Role       Role           `json:"role"`
-	Status     RequestStatus  `json:"status"`
-	UserStatus UserSeenStatus `json:"user_status"`
-} // @name Request
-
 func CreateRequest(userID int64, role Role) (*Request, error) {
 	res, err := DB.Exec("INSERT INTO Requests (user_id, role, status, user_status) VALUES (?, ?, ?, ?)", userID, role, Pending, Unseen)
 	if err != nil {

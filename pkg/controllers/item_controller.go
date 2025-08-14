@@ -196,9 +196,7 @@ func (c *ItemController) GetItemsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if tagsParam == "" {
-		tags = allTags
-	} else {
+	if tagsParam != "" {
 		for _, tagName := range strings.Split(strings.TrimSpace(tagsParam), ",") {
 			found := false
 			for _, tag := range allTags {

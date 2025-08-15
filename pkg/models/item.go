@@ -74,17 +74,12 @@ func EditItem(ctx context.Context, id int64, name string, description string, pr
 		return nil, err
 	}
 
-	res, err := tx.Exec("UPDATE Items SET name = ?, description = ?, price = ?, is_available = ?, image_url = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM Items WHERE name = ? AND id != ?) AS temp_table);", name, description, price, available, imageURL, id, name, id)
+	_, err = tx.Exec("UPDATE Items SET name = ?, description = ?, price = ?, is_available = ?, image_url = ? WHERE id = ? AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM Items WHERE name = ? AND id != ?) AS temp_table);", name, description, price, available, imageURL, id, name, id)
 	if err != nil {
 		if err1 := tx.Rollback(); err1 != nil {
 			return nil, fmt.Errorf("%v %v", err1, err)
 		}
 		return nil, err
-	}
-
-	if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
-		_ = tx.Rollback()
-		return nil, fmt.Errorf("item not found with id '%d'", id)
 	}
 
 	_, err = tx.Exec("DELETE FROM ItemTags WHERE item_id = ?", id)
@@ -140,8 +135,8 @@ func GetItemById(id int64) (*Item, error) {
 	       								),
 									']') as tags
 									FROM Items 
-									JOIN ItemTags ON ItemTags.item_id = Items.id 
-									JOIN Tags ON ItemTags.tag_id = Tags.id
+									LEFT JOIN ItemTags ON ItemTags.item_id = Items.id 
+									LEFT JOIN Tags ON ItemTags.tag_id = Tags.id
 									WHERE Items.id = ?
 									GROUP BY Items.id
 									LIMIT 1;`, id)
@@ -171,7 +166,7 @@ func GetItems(tags []Tag, search string, available bool, limit int, offset int) 
 					']') as tags
 					FROM Items
 					LEFT JOIN ItemTags ON ItemTags.item_id = Items.id 
-					LEFT JOIN Tags ON ItemTags.tag_id = Tags.id `
+					LEFT JOIN Tags ON ItemTags.tag_id = Tags.id WHERE 1=1 `
 	var args []any
 
 	if search != "" {
@@ -182,14 +177,12 @@ func GetItems(tags []Tag, search string, available bool, limit int, offset int) 
 		query += " AND is_available = false"
 	}
 	if len(tags) > 0 {
-		query += "WHERE Items.id IN (SELECT item_id FROM ItemTags WHERE tag_id IN ("
+		query += "AND Items.id IN (SELECT item_id FROM ItemTags WHERE tag_id IN ("
 		for i := range tags {
 			query += "?,"
 			args = append(args, tags[i].ID)
 		}
 		query = query[:len(query)-1] + ")) "
-	} else {
-		query += "WHERE 1=1 "
 	}
 	query += " GROUP BY Items.id LIMIT ? OFFSET ?;"
 	args = append(args, limit, offset)
@@ -213,7 +206,7 @@ func GetItems(tags []Tag, search string, available bool, limit int, offset int) 
 
 func GetItemByIdBulk(ids []int64) (*[]Item, error) {
 
-	query := "SELECT Items.id, Items.name, description, price, is_available, image_url, CONCAT('[', GROUP_CONCAT(JSON_OBJECT('id', Tags.id, 'name', Tags.name)), ']') as tags FROM Items JOIN ItemTags ON ItemTags.item_id = Items.id JOIN Tags ON ItemTags.tag_id = Tags.id WHERE Items.id IN ("
+	query := "SELECT Items.id, Items.name, description, price, is_available, image_url, CONCAT('[', GROUP_CONCAT(JSON_OBJECT('id', Tags.id, 'name', Tags.name)), ']') as tags FROM Items LEFT JOIN ItemTags ON ItemTags.item_id = Items.id LEFT JOIN Tags ON ItemTags.tag_id = Tags.id WHERE Items.id IN ("
 
 	args := make([]any, len(ids))
 	for i, id := range ids {

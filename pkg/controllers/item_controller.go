@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/gqvz/mvc/pkg/models"
+	"github.com/gqvz/mvc/pkg/services"
 	"log"
 	"net/http"
 	"strconv"
@@ -86,6 +87,8 @@ func (c *ItemController) CreateItemHandler(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Failed to create item", http.StatusInternalServerError)
 		return
 	}
+
+	services.ClearItemsCache()
 
 	response := CreateItemResponse{ID: item.ID}
 	w.WriteHeader(http.StatusCreated)
@@ -189,14 +192,22 @@ func (c *ItemController) GetItemsHandler(w http.ResponseWriter, r *http.Request)
 	limitParam := r.URL.Query().Get("limit")
 	offsetParam := r.URL.Query().Get("offset")
 
-	var tags []models.Tag
-	allTags, err := models.GetTags()
-	if err != nil {
-		http.Error(w, "Failed to get tags", http.StatusInternalServerError)
-		return
+	if tagsParam == "" && searchParam == "" && availableParam == "" && limitParam == "" && offsetParam == "" {
+		cachedResponse := services.GetItemsCache()
+		if cachedResponse != "" {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(cachedResponse))
+			return
+		}
 	}
-
+	var tags []models.Tag
 	if tagsParam != "" {
+		allTags, err := models.GetTags()
+		if err != nil {
+			http.Error(w, "Failed to get tags", http.StatusInternalServerError)
+			return
+		}
+
 		for _, tagName := range strings.Split(strings.TrimSpace(tagsParam), ",") {
 			found := false
 			for _, tag := range allTags {
@@ -262,12 +273,19 @@ func (c *ItemController) GetItemsHandler(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(responseItems)
+	jsonData, err := json.Marshal(responseItems)
 	if err != nil {
 		log.Printf("Error encoding response: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+
+	if tagsParam == "" && searchParam == "" && availableParam == "" && limitParam == "" && offsetParam == "" {
+		services.SetItemsCache(string(jsonData))
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 type EditItemRequest = CreateItemRequest // @name EditItemRequest
@@ -343,6 +361,8 @@ func (c *ItemController) EditItemHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Item not found", http.StatusNotFound)
 		return
 	}
+
+	services.ClearItemsCache()
 
 	w.WriteHeader(http.StatusOK)
 

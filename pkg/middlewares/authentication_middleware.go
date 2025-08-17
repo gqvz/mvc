@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/gqvz/mvc/pkg/services"
 	"log"
 	"net/http"
 	"strings"
@@ -16,6 +17,8 @@ type Claims struct {
 }
 
 func CreateAuthenticationMiddleware(jwtSecret string) func(next http.Handler) http.Handler {
+	tokenCache := services.GetTokenCache()
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var tokenString string
@@ -25,6 +28,16 @@ func CreateAuthenticationMiddleware(jwtSecret string) func(next http.Handler) ht
 			}
 
 			if tokenString == "" {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			cachedToken, exists := tokenCache.GetToken(tokenString)
+			if exists {
+				ctx := r.Context()
+				ctx = context.WithValue(ctx, "userid", cachedToken.UserID)
+				ctx = context.WithValue(ctx, "role", cachedToken.Role)
+				r = r.WithContext(ctx)
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -42,6 +55,8 @@ func CreateAuthenticationMiddleware(jwtSecret string) func(next http.Handler) ht
 			}
 
 			if claims, ok := token.Claims.(*Claims); ok {
+				tokenCache.AddToken(tokenString, claims.UserID, claims.Role, claims.ExpiresAt.Time)
+
 				ctx := r.Context()
 				ctx = context.WithValue(ctx, "userid", claims.UserID)
 				ctx = context.WithValue(ctx, "role", claims.Role)

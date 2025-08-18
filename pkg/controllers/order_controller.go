@@ -47,8 +47,8 @@ func (c *OrderController) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.TableNumber <= 0 {
-		http.Error(w, "Table number must be greater than 0", http.StatusBadRequest)
+	if req.TableNumber <= 0 || req.TableNumber > 100 {
+		http.Error(w, "Table number must be greater than 0 and less than 100", http.StatusBadRequest)
 		return
 	}
 

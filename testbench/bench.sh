@@ -4,6 +4,8 @@ echo "Starting API benchmarking process..."
 
 source testbench/credentials.env
 
+BASE_URL="http://localhost:3000/api"
+
 echo "Testing API connectivity..."
 if ! curl -s "$BASE_URL/items" > /dev/null 2>&1; then
     echo "Error: API is not accessible at $BASE_URL. Please make sure the server is running."

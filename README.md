@@ -12,3 +12,8 @@ If not using docker:
 A default admin user is created with the following credentials:
 - Username: `admin`
 - Password: `g`
+
+Benchmarking:
+```
+./testbench/bench.sh
+```

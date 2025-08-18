@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./setup.sh
+
 echo "Starting API benchmarking process..."
 
 source testbench/credentials.env
@@ -58,7 +60,7 @@ echo "Benchmarking POST /api/orders/$ORDER_ID/items"
 echo "Duration: ${DURATION}s, Concurrency: $CONCURRENCY"
 echo "Using order ID: $ORDER_ID"
 
-ab -t $DURATION -c $CONCURRENCY \
+ab -l -t $DURATION -c $CONCURRENCY \
     -H "Authorization: Bearer $JWT_TOKEN" \
     -H "Content-Type: application/json" \
     -T "application/json" \

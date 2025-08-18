@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./setup.sh
+source ./testbench/setup.sh
 
 echo "Starting API benchmarking process..."
 

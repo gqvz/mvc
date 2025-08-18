@@ -15,5 +15,6 @@ A default admin user is created with the following credentials:
 
 Benchmarking:
 ```
+# ensure you are in the root repo directory
 ./testbench/bench.sh
 ```

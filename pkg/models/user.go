@@ -114,7 +114,7 @@ func GetUsers(search string, role Role, limit int, offset int) ([]User, error) {
 }
 
 func AddUserRole(id int64, role Role) error {
-	_, err := DB.Exec("UPDATE Users SET role = role | ? WHERE id = ?", role, id)
+	_, err := DB.Exec("UPDATE Users SET role = ? WHERE id = ?", role, id)
 	return err
 }
 

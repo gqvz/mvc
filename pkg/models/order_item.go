@@ -6,7 +6,7 @@ import (
 )
 
 func CreateOrderItem(orderId int64, userId int64, itemId int64, quantity int, customInstructions string) (*OrderItem, error) {
-	res, err := DB.Exec("INSERT INTO OrderItems (order_id, item_id, count, status, custom_instructions) SELECT ?, ?, ?, ?, ? FROM Orders WHERE id = ? AND customer_id = ? AND status = 'open'", orderId, itemId, quantity, Preparing, customInstructions, orderId, userId)
+	res, err := DB.Exec("INSERT INTO OrderItems (order_id, item_id, count, status, custom_instructions) SELECT ?, ?, ?, ?, ? FROM Orders WHERE id = ? AND customer_id = ? AND status = 'open'", orderId, itemId, quantity, ItemPending, customInstructions, orderId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func CreateOrderItem(orderId int64, userId int64, itemId int64, quantity int, cu
 		ItemID:             itemId,
 		Quantity:           quantity,
 		CustomInstructions: customInstructions,
-		Status:             Preparing,
+		Status:             ItemPending,
 	}, nil
 }
 

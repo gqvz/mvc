@@ -4,7 +4,7 @@ CREATE TABLE `OrderItems`
     `order_id`            INTEGER             NOT NULL,
     `item_id`             INTEGER             NOT NULL,
     `count`               INTEGER             NOT NULL,
-    `status`              ENUM ('preparing','completed') NOT NULL,
+    `status`              ENUM ('preparing','completed','pending') NOT NULL,
     `custom_instructions` VARCHAR(255),
     FOREIGN KEY (`order_id`) REFERENCES `Orders` (`id`),
     FOREIGN KEY (`item_id`) REFERENCES `Items` (`id`)

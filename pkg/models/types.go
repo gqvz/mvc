@@ -65,6 +65,8 @@ type ItemStatus string // @name ItemStatus
 const (
 	Preparing ItemStatus = "preparing"
 	Completed ItemStatus = "completed"
+
+	ItemPending ItemStatus = "pending"
 ) // @name ItemStatus
 
 type OrderItem struct {

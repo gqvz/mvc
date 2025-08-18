@@ -128,7 +128,7 @@ func (c *OrderItemController) EditOrderItemStatus(w http.ResponseWriter, r *http
 	err = models.EditOrderItemStatus(orderItemId, req.Status)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			http.Error(w, "Order item not found", http.StatusNotFound)
+			http.Error(w, "Status invalid", http.StatusConflict)
 			return
 		}
 		http.Error(w, "Failed to update order item status: ", http.StatusInternalServerError)
@@ -222,7 +222,7 @@ func (c *OrderItemController) GetOrderItemsByStatus(w http.ResponseWriter, r *ht
 	status := r.URL.Query().Get("status")
 
 	if status == "" {
-		status = string(models.Preparing)
+		status = string(models.Pending)
 	}
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit <= 0 || limit > 20 {
